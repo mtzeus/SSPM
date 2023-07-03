@@ -16,7 +16,7 @@ class PerformanceMonitor:
         self.root = root
         self.root.title("SSPM") 
         self.root.geometry("90x60") 
-        self.root.overrideredirect(True) #caso remova o "#" irá remover a barra de título
+        self.root.overrideredirect(True) #caso adcione # no inicio dessa linha irá adcionar a barra de título
         self.root.attributes("-topmost", True)  # Mantém o monitor no topo de outros aplicativos
         self.root.attributes("-alpha", TRANSPARENCY)  # Define a transparência da janela
 
