@@ -1,59 +1,49 @@
-import sys
-from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QSlider, QPushButton
-from PyQt5.QtGui import QPainter, QColor, QFont
-from PyQt5.QtCore import Qt, QTimer
 import psutil
+import tkinter as tk
 
-class OverlayWindow(QWidget):
-    def __init__(self, transparency):
-        super().__init__()
+# Configurações do monitor
+FONT = ("Arial", 12)
+BG_COLOR = "black"
+FG_COLOR = "green"
+TRANSPARENCY = 0.7  # Valor de 0.0 (totalmente transparente) a 1.0 (totalmente opaco)
 
-        self.setWindowTitle("Monitor de Desempenho")
-        self.setGeometry(0, 0, 300, 100)
-        self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
-        self.setAttribute(Qt.WA_TranslucentBackground)
-        self.setWindowOpacity(transparency / 100)
+class PerformanceMonitor:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Monitor de Desempenho")
+        self.root.geometry("100x60")
+        self.root.overrideredirect(True)  # Remove a barra de título
+        self.root.attributes("-topmost", True)  # Mantém o monitor no topo de outros aplicativos
+        self.root.attributes("-alpha", TRANSPARENCY)  # Define a transparência da janela
 
-        self.cpu_label = QLabel(self)
-        self.cpu_label.move(10, 10)
-        self.cpu_label.setFont(QFont("Arial", 12))
-        self.cpu_label.setStyleSheet("color: white")
+        self.cpu_label = tk.Label(root, text="CPU: 0%", font=FONT, bg=BG_COLOR, fg=FG_COLOR)
+        self.cpu_label.pack(padx=5, pady=5)
 
-        self.ram_label = QLabel(self)
-        self.ram_label.move(10, 40)
-        self.ram_label.setFont(QFont("Arial", 12))
-        self.ram_label.setStyleSheet("color: white")
+        self.ram_label = tk.Label(root, text="RAM: 0%", font=FONT, bg=BG_COLOR, fg=FG_COLOR)
+        self.ram_label.pack(padx=5, pady=5)
 
-        self.disk_label = QLabel(self)
-        self.disk_label.move(10, 70)
-        self.disk_label.setFont(QFont("Arial", 12))
-        self.disk_label.setStyleSheet("color: white")
+        self.update()
 
-        self.update_labels()
+    def update(self):
+        cpu_percent = self.calculate_cpu_usage()
+        ram_percent = self.calculate_ram_usage()
 
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.update_labels)
-        self.timer.start(1000)  # Atualiza os indicadores a cada segundo
+        self.cpu_label.config(text=f"CPU: {cpu_percent}%")
+        self.ram_label.config(text=f"RAM: {ram_percent}%")
 
-    def paintEvent(self, event):
-        painter = QPainter(self)
-        painter.setRenderHint(QPainter.Antialiasing)
-        painter.fillRect(self.rect(), QColor(30, 30, 30, 180))
+        self.root.after(1000, self.update)
 
-    def update_labels(self):
-        cpu_percent = psutil.cpu_percent(interval=1)
+    def calculate_cpu_usage(self):
+        cpu_percent = psutil.cpu_percent()
+        return round(cpu_percent, 2)
+
+    def calculate_ram_usage(self):
         ram_percent = psutil.virtual_memory().percent
-        disk_percent = psutil.disk_usage('/').percent
+        return round(ram_percent, 2)
 
-        self.cpu_label.setText(f"CPU: {cpu_percent}%")
-        self.ram_label.setText(f"RAM: {ram_percent}%")
-        self.disk_label.setText(f"Disco: {disk_percent}%")
+root = tk.Tk()
+root.configure(bg=BG_COLOR)
 
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
+monitor = PerformanceMonitor(root)
 
-    transparency = 80  # Defina a transparência desejada
-    overlay = OverlayWindow(transparency)
-    overlay.show()
-
-    sys.exit(app.exec())
+root.mainloop()
