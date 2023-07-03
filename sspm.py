@@ -1,18 +1,22 @@
 import psutil
 import tkinter as tk
 
+# About #
+# Desenvolvido por www.twitter.com/mtz_treze
+# Melhorias são bem vindas.
+
 # Configurações do monitor
 FONT = ("Arial", 12)
-BG_COLOR = "black"
-FG_COLOR = "green"
+BG_COLOR = "black" # 
+FG_COLOR = "green" 
 TRANSPARENCY = 0.7  # Valor de 0.0 (totalmente transparente) a 1.0 (totalmente opaco)
 
 class PerformanceMonitor:
     def __init__(self, root):
         self.root = root
-        self.root.title("Monitor de Desempenho")
-        self.root.geometry("100x60")
-        self.root.overrideredirect(True)  # Remove a barra de título
+        self.root.title("SSPM") 
+        self.root.geometry("90x60") 
+        self.root.overrideredirect(True) #caso remova o "#" irá remover a barra de título
         self.root.attributes("-topmost", True)  # Mantém o monitor no topo de outros aplicativos
         self.root.attributes("-alpha", TRANSPARENCY)  # Define a transparência da janela
 
